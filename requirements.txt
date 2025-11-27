@@ -1,0 +1,8 @@
+# Não há dependências externas - apenas biblioteca padrão do Python
+# Python 3.8+ requerido
+
+# Para criar executável standalone (opcional):
+# pyinstaller>=5.0
+# auto-py-to-exe>=2.0
+
+# Nota: Tkinter já vem incluído na instalação padrão do Python
