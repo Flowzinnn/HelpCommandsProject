@@ -12,10 +12,10 @@ HISTORY_FILE = "command_history.json"
 @dataclass
 class AppConfig:
     """Configurações da aplicação."""
-    theme: str = "light"
-    auto_scroll: bool = True
+    theme: str = "dark"
+    auto_scroll_console: bool = True
     confirm_critical: bool = True
-    show_admin_warning: bool = True
+    show_admin_warnings: bool = True
     favorites: List[str] = None
     window_width: int = 1200
     window_height: int = 800
@@ -62,6 +62,10 @@ class ConfigManager:
                 json.dump(asdict(self.config), f, indent=4, ensure_ascii=False)
         except Exception as e:
             print(f"Erro ao salvar configurações: {e}")
+    
+    def save_config(self) -> None:
+        """Alias para salvar_config (compatibilidade)."""
+        self.salvar_config()
     
     def carregar_historico(self) -> List[CommandHistoryEntry]:
         """Carrega histórico de comandos do arquivo JSON."""
@@ -132,7 +136,7 @@ class ConfigManager:
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write("=" * 80 + "\n")
-                f.write("HISTÓRICO DE COMANDOS - MINI TERMINAL\n")
+                f.write("HISTÓRICO DE COMANDOS - HELP COMMANDS\n")
                 f.write("=" * 80 + "\n\n")
                 
                 for entry in self.history:
@@ -148,3 +152,30 @@ class ConfigManager:
         except Exception as e:
             print(f"Erro ao exportar histórico: {e}")
             return False
+    
+    def get_history(self) -> List[Dict[str, Any]]:
+        """Retorna histórico em formato de dicionário."""
+        return [
+            {
+                "timestamp": entry.timestamp,
+                "command_key": entry.command_key,
+                "command_name": entry.command_name,
+                "status": "sucesso" if entry.success else "erro"
+            }
+            for entry in self.history
+        ]
+    
+    def add_to_history(self, command_key: str, command_name: str, status: str) -> None:
+        """Adiciona entrada ao histórico (formato simplificado)."""
+        self.adicionar_ao_historico(
+            command_key=command_key,
+            command_name=command_name,
+            command_text=command_name,
+            success=(status == "sucesso"),
+            is_free_command=False
+        )
+    
+    def clear_history(self) -> None:
+        """Limpa todo o histórico."""
+        self.history = []
+        self.salvar_historico()

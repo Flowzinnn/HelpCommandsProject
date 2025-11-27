@@ -1,4 +1,6 @@
-# Não há dependências externas - apenas biblioteca padrão do Python
+# Dependências do projeto
+customtkinter>=5.2.0
+
 # Python 3.8+ requerido
 
 # Para criar executável standalone (opcional):

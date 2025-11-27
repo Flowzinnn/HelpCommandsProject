@@ -28,8 +28,9 @@ REM Verificar Tkinter
 python -m tkinter >nul 2>&1
 if errorlevel 1 (
     echo [AVISO] Tkinter pode nao estar disponivel
-    echo Tentando executar mesmo assim...
+    echo A aplicacao pode nao funcionar corretamente.
     echo.
+    pause
 ) else (
     echo [OK] Tkinter disponivel
     echo.
@@ -38,29 +39,21 @@ if errorlevel 1 (
 REM Perguntar modo de execução
 echo Como deseja executar?
 echo.
-echo [1] Interface Grafica (GUI) - Recomendado
-echo [2] Modo Terminal (linha de comando)
-echo [3] GUI como Administrador
+echo [1] Executar Normalmente
+echo [2] Executar como Administrador
 echo.
-set /p choice="Escolha (1-3): "
+set /p choice="Escolha (1-2): "
 
-if "%choice%"=="1" (
-    echo.
-    echo Iniciando interface grafica...
-    python main.py
-) else if "%choice%"=="2" (
-    echo.
-    echo Iniciando modo terminal...
-    python main.py --terminal
-) else if "%choice%"=="3" (
+if "%choice%"=="2" (
     echo.
     echo Solicitando privilegios administrativos...
     powershell -Command "Start-Process python -ArgumentList 'main.py' -Verb RunAs"
 ) else (
     echo.
-    echo Opcao invalida! Executando GUI padrao...
+    echo Iniciando interface grafica...
     python main.py
 )
 
 echo.
 pause
+

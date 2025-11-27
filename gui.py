@@ -9,16 +9,16 @@ from commands_config import get_all_commands
 from executor import executar_comando, executar_comando_livre, configurar_logger, indexar_por_key
 from config_manager import ConfigManager
 from help_system import HelpSystem
-from platform_detector import detectar_sistema, eh_admin
 from collections import defaultdict
+import ctypes
 
 
-class MiniTerminalGUI:
-    """Interface gráfica principal do Mini Terminal."""
+class HelpCommandsGUI:
+    """Interface gráfica principal do Help Commands."""
     
     def __init__(self, root: tk.Tk):
         self.root = root
-        self.root.title("Mini Terminal - Painel de Controle de Suporte")
+        self.root.title("Help Commands - Painel de Suporte Técnico")
         
         # Inicializar gerenciadores
         self.config_manager = ConfigManager()
@@ -31,8 +31,9 @@ class MiniTerminalGUI:
         self.comandos_filtrados = self.comandos.copy()
         
         # Detectar sistema
-        self.os_type, self.os_version = detectar_sistema()
-        self.is_admin = eh_admin()
+        import platform
+        self.os_version = f"Windows {platform.release()}"
+        self.is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
         
         # Variáveis de interface
         self.search_var = tk.StringVar()
@@ -361,8 +362,73 @@ class MiniTerminalGUI:
     
     def _apply_theme(self):
         """Aplica o tema configurado."""
-        # Por enquanto, tema padrão
-        pass
+        theme = self.config_manager.config.theme
+        
+        if theme == "dark":
+            # Tema Escuro
+            bg_color = "#2b2b2b"
+            fg_color = "#ffffff"
+            secondary_bg = "#363636"
+            button_bg = "#404040"
+            highlight_bg = "#505050"
+            entry_bg = "#363636"
+            text_bg = "#1e1e1e"
+        else:
+            # Tema Claro (padrão)
+            bg_color = "#f0f0f0"
+            fg_color = "#000000"
+            secondary_bg = "#ffffff"
+            button_bg = "#e0e0e0"
+            highlight_bg = "#d0d0d0"
+            entry_bg = "#ffffff"
+            text_bg = "#ffffff"
+        
+        # Aplicar cores à janela principal
+        self.root.configure(bg=bg_color)
+        
+        # Atualizar todos os frames e widgets
+        for widget in self.root.winfo_children():
+            self._apply_theme_recursive(widget, bg_color, fg_color, secondary_bg, 
+                                       button_bg, highlight_bg, entry_bg, text_bg)
+    
+    def _apply_theme_recursive(self, widget, bg_color, fg_color, secondary_bg, 
+                               button_bg, highlight_bg, entry_bg, text_bg):
+        """Aplica tema recursivamente a todos os widgets."""
+        try:
+            widget_type = widget.winfo_class()
+            
+            if widget_type == "Frame":
+                widget.configure(bg=bg_color)
+            elif widget_type == "Label":
+                widget.configure(bg=bg_color, fg=fg_color)
+            elif widget_type == "Button":
+                # Manter cores específicas de botões importantes
+                if widget.cget("bg") not in ["#27ae60", "#e74c3c", "#3498db"]:
+                    widget.configure(bg=button_bg, fg=fg_color)
+            elif widget_type == "Entry":
+                widget.configure(bg=entry_bg, fg=fg_color, 
+                               insertbackground=fg_color)
+            elif widget_type == "Listbox":
+                widget.configure(bg=secondary_bg, fg=fg_color, 
+                               selectbackground=highlight_bg)
+            elif widget_type == "Text":
+                widget.configure(bg=text_bg, fg=fg_color, 
+                               insertbackground=fg_color)
+            elif widget_type == "Checkbutton":
+                widget.configure(bg=bg_color, fg=fg_color, 
+                               selectcolor=secondary_bg)
+            elif widget_type == "Radiobutton":
+                widget.configure(bg=bg_color, fg=fg_color, 
+                               selectcolor=secondary_bg)
+            elif widget_type == "Toplevel":
+                widget.configure(bg=bg_color)
+            
+            # Recursivamente aplicar aos filhos
+            for child in widget.winfo_children():
+                self._apply_theme_recursive(child, bg_color, fg_color, secondary_bg,
+                                           button_bg, highlight_bg, entry_bg, text_bg)
+        except:
+            pass
     
     def update_command_list(self, filter_text: str = ""):
         """Atualiza a lista de comandos baseado nos filtros."""
@@ -703,7 +769,7 @@ class MiniTerminalGUI:
         """Mostra diálogo de configurações."""
         dialog = tk.Toplevel(self.root)
         dialog.title("Configurações")
-        dialog.geometry("500x400")
+        dialog.geometry("500x450")
         dialog.transient(self.root)
         dialog.grab_set()
         
@@ -721,6 +787,36 @@ class MiniTerminalGUI:
         
         config_frame = tk.Frame(dialog)
         config_frame.pack(padx=30, pady=10, fill=tk.BOTH, expand=True)
+        
+        # Tema
+        tk.Label(
+            config_frame,
+            text="🎨 Tema da Interface:",
+            font=("Segoe UI", 10, "bold")
+        ).pack(anchor=tk.W, pady=(10, 5))
+        
+        theme_var = tk.StringVar(value=self.config_manager.config.theme)
+        theme_frame = tk.Frame(config_frame)
+        theme_frame.pack(anchor=tk.W, padx=20, pady=5)
+        
+        tk.Radiobutton(
+            theme_frame,
+            text="☀️ Claro",
+            variable=theme_var,
+            value="light",
+            font=("Segoe UI", 10)
+        ).pack(side=tk.LEFT, padx=10)
+        
+        tk.Radiobutton(
+            theme_frame,
+            text="🌙 Escuro",
+            variable=theme_var,
+            value="dark",
+            font=("Segoe UI", 10)
+        ).pack(side=tk.LEFT, padx=10)
+        
+        # Separador
+        ttk.Separator(config_frame, orient='horizontal').pack(fill='x', pady=15)
         
         # Auto-scroll
         auto_scroll_var = tk.BooleanVar(value=self.config_manager.config.auto_scroll)
@@ -750,11 +846,21 @@ class MiniTerminalGUI:
         ).pack(anchor=tk.W, pady=5)
         
         def save():
+            # Verificar se tema mudou
+            theme_changed = theme_var.get() != self.config_manager.config.theme
+            
+            self.config_manager.config.theme = theme_var.get()
             self.config_manager.config.auto_scroll = auto_scroll_var.get()
             self.config_manager.config.confirm_critical = confirm_var.get()
             self.config_manager.config.show_admin_warning = admin_warning_var.get()
             self.config_manager.salvar_config()
-            messagebox.showinfo("Configurações", "Configurações salvas com sucesso!")
+            
+            if theme_changed:
+                self._apply_theme()
+                messagebox.showinfo("Configurações", "Configurações salvas!\nO tema foi atualizado.")
+            else:
+                messagebox.showinfo("Configurações", "Configurações salvas com sucesso!")
+            
             dialog.destroy()
         
         btn_frame = tk.Frame(dialog)
@@ -793,7 +899,7 @@ class MiniTerminalGUI:
 def main():
     """Função principal para iniciar a GUI."""
     root = tk.Tk()
-    app = MiniTerminalGUI(root)
+    app = HelpCommandsGUI(root)
     root.mainloop()
 
 

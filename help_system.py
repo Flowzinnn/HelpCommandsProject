@@ -10,12 +10,12 @@ class HelpSystem:
         """Retorna o guia de uso da aplicação."""
         return r"""
 ═══════════════════════════════════════════════════════════════════
-                    GUIA DE USO - MINI TERMINAL
+                    GUIA DE USO - HELP COMMANDS
 ═══════════════════════════════════════════════════════════════════
 
 📌 SOBRE
 --------
-O Mini Terminal é uma ferramenta de suporte técnico que permite executar
+O Help Commands é uma ferramenta de suporte técnico que permite executar
 comandos do sistema de forma rápida e organizada. Ideal para:
   • Suporte remoto
   • Acesso rápido a configurações do sistema
@@ -202,14 +202,14 @@ Solução:
         """Retorna informações sobre a aplicação."""
         return r"""
 ═══════════════════════════════════════════════════════════════════
-                    SOBRE - MINI TERMINAL
+                    SOBRE - HELP COMMANDS
 ═══════════════════════════════════════════════════════════════════
 
 📱 INFORMAÇÕES
 --------------
-Nome: Mini Terminal - Painel de Controle de Suporte
-Versão: 2.0.0
-Plataforma: Windows / Linux
+Nome: Help Commands - Painel de Suporte Técnico
+Versão: 3.2.0
+Plataforma: Windows
 Interface: Tkinter GUI
 
 📋 DESCRIÇÃO
@@ -277,7 +277,8 @@ podem fazer alterações permanentes no sistema.
 
 ═══════════════════════════════════════════════════════════════════
 
-Desenvolvido com ❤️ para facilitar o trabalho de suporte técnico.
+Programado e desenvolvido em Python por Nicolas Wolf para atender
+demandas de suporte técnico.
 
 ═══════════════════════════════════════════════════════════════════
 """

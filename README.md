@@ -188,10 +188,10 @@ Command(
 # Instalar PyInstaller
 pip install pyinstaller
 
-# Gerar executável
-pyinstaller --onefile --windowed --name="MiniTerminal" --icon=icon.ico main.py
+# Gerar executável (sempre solicita privilégios de administrador)
+pyinstaller HelpCommands.spec
 
-# Executável estará em dist/MiniTerminal.exe
+# Executável estará em dist/HelpCommands.exe
 ```
 
 ---

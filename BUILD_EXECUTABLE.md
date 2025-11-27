@@ -1,10 +1,10 @@
-# 📦 Como Criar Executável Standalone
+# 📦 Como Criar Executável Standalone Windows
 
-Este guia mostra como transformar o Mini Terminal em um executável independente (.exe no Windows ou binário no Linux) que pode ser distribuído sem precisar do Python instalado.
+Este guia mostra como transformar o Mini Terminal em um executável independente (.exe) que pode ser distribuído sem precisar do Python instalado.
 
 ---
 
-## 🪟 Windows - Criar .EXE
+## 🪟 Criar Executável .EXE
 
 ### Método 1: PyInstaller (Recomendado)
 
@@ -64,32 +64,6 @@ auto-py-to-exe
 - **Console Window:** Window Based
 - **Icon:** Selecione seu ícone (opcional)
 - Clique em **CONVERT .PY TO .EXE**
-
----
-
-## 🐧 Linux - Criar Binário
-
-### Usando PyInstaller
-
-#### 1. Instalar PyInstaller
-```bash
-pip3 install pyinstaller
-```
-
-#### 2. Criar Binário
-```bash
-pyinstaller --onefile --windowed --name="MiniTerminal" main.py
-```
-
-#### 3. Tornar Executável
-```bash
-chmod +x dist/MiniTerminal
-```
-
-#### 4. Executar
-```bash
-./dist/MiniTerminal
-```
 
 ---
 
@@ -173,7 +147,6 @@ img.save('icon.ico', format='ICO', sizes=[(256, 256)])
 
 ## 📦 Distribuir o Executável
 
-### Windows
 1. Copie `dist/MiniTerminal.exe` para onde quiser
 2. Não precisa de Python instalado
 3. Pode distribuir por:
@@ -246,9 +219,9 @@ Cria uma pasta com o executável e DLLs (startup mais rápido, mas mais arquivos
 
 ---
 
-## 🔐 Assinatura Digital (Opcional - Windows)
+## 🔐 Assinatura Digital (Opcional)
 
-Para evitar avisos do SmartScreen:
+Para evitar avisos do SmartScreen do Windows:
 
 ### 1. Obter Certificado
 - Compre de CA confiável (Digicert, Sectigo, etc)
@@ -322,32 +295,32 @@ Salve como `build.bat`:
 ```batch
 @echo off
 echo ========================================
-echo   COMPILANDO MINI TERMINAL
+echo   COMPILANDO HELPCOMMANDS
 echo ========================================
 echo.
 
 REM Limpar builds anteriores
 if exist build rmdir /s /q build
 if exist dist rmdir /s /q dist
-if exist *.spec del *.spec
 
 echo Instalando PyInstaller...
 pip install pyinstaller
 
 echo.
-echo Compilando executavel...
-pyinstaller --onefile ^
-    --windowed ^
-    --name="MiniTerminal" ^
-    --icon=icon.ico ^
-    main.py
+echo Compilando executavel com requisicao de admin...
+pyinstaller HelpCommands.spec
 
 echo.
 echo ========================================
-if exist "dist\MiniTerminal.exe" (
+if exist "dist\HelpCommands.exe" (
     echo [OK] Executavel criado com sucesso!
     echo.
     echo Localizacao: dist\MiniTerminal.exe
+    echo.
+    echo [OK] Executavel criado com sucesso!
+    echo.
+    echo Localizacao: dist\HelpCommands.exe
+    echo NOTA: Este executavel sempre solicitara privilegios de administrador
     echo.
     explorer dist
 ) else (
@@ -364,4 +337,4 @@ Execute:
 
 ---
 
-**✅ Pronto!** Agora você tem um executável standalone do Mini Terminal que pode ser distribuído para qualquer computador Windows sem precisar do Python instalado.
+**✅ Pronto!** Agora você tem o executável `HelpCommands.exe` que sempre solicita privilégios de administrador ao ser executado e pode ser distribuído para qualquer computador Windows sem precisar do Python instalado.

@@ -1,9 +1,8 @@
 import logging
 import subprocess
-import sys
 from typing import Iterable, Dict, Optional, Callable
+import ctypes
 from models import Command
-from platform_detector import eh_windows, eh_linux, eh_admin
 
 
 LOG_FILE = "mini_terminal_suporte.log"
@@ -84,38 +83,6 @@ def executar_com_elevacao_windows(comando: str) -> bool:
         return False
 
 
-def executar_com_sudo_linux(comando: str) -> bool:
-    """
-    Executa comando com sudo no Linux.
-    
-    Returns:
-        True se executado com sucesso, False caso contrário.
-    """
-    try:
-        comando_sudo = f"sudo {comando}"
-        print(f"\n[EXECUTANDO COM SUDO] {comando_sudo}\n")
-        
-        resultado = subprocess.run(
-            comando_sudo,
-            shell=True,
-            text=True,
-        )
-        
-        if resultado.returncode == 0:
-            print("Comando executado com sucesso.")
-            logging.info("Comando sudo executado: %s", comando)
-            return True
-        else:
-            print(f"Comando retornou código: {resultado.returncode}")
-            logging.warning("Comando sudo retornou %s: %s", resultado.returncode, comando)
-            return False
-            
-    except Exception as e:
-        print(f"Erro ao executar com sudo: {e}")
-        logging.error("Falha no sudo: %s", e)
-        return False
-
-
 def executar_comando(cmd: Command, confirmacao_callback: Optional[Callable[[Command], bool]] = None) -> None:
     """
     Executa um Command, solicitando elevação se necessário.
@@ -135,21 +102,15 @@ def executar_comando(cmd: Command, confirmacao_callback: Optional[Callable[[Comm
     print(f"\n[EXECUTANDO] {cmd.name} -> {cmd.command}\n")
     
     # Verificar se precisa de privilégios administrativos
-    if cmd.requires_admin and not eh_admin():
+    is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+    
+    if cmd.requires_admin and not is_admin:
         print(f"⚠️  Este comando requer privilégios administrativos.")
-        
-        if eh_windows():
-            print("Solicitando elevação via UAC...")
-            if executar_com_elevacao_windows(cmd.command):
-                return
-            else:
-                print("Falha na elevação. Executando sem privilégios...")
-        elif eh_linux():
-            print("Executando com sudo...")
-            if executar_com_sudo_linux(cmd.command):
-                return
-            else:
-                print("Falha no sudo. Tentando executar sem privilégios...")
+        print("Solicitando elevação via UAC...")
+        if executar_com_elevacao_windows(cmd.command):
+            return
+        else:
+            print("Falha na elevação. Executando sem privilégios...")
     
     # Execução normal
     try:
@@ -195,15 +156,12 @@ def executar_comando_livre(comando_texto: str, requer_admin: bool = False) -> No
     print(f"\n[EXECUTANDO LIVRE] {comando_texto}\n")
     
     # Elevação se solicitada
-    if requer_admin and not eh_admin():
+    is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+    
+    if requer_admin and not is_admin:
         print(f"⚠️  Executando com privilégios administrativos...")
-        
-        if eh_windows():
-            executar_com_elevacao_windows(comando_texto)
-            return
-        elif eh_linux():
-            executar_com_sudo_linux(comando_texto)
-            return
+        executar_com_elevacao_windows(comando_texto)
+        return
     
     # Execução normal
     try:
