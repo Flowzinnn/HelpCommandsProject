@@ -409,11 +409,11 @@ Técnico: "Vou fazer uma manutenção rápida. Pode acompanhar."
 
 **💬 Feedback dos Usuários:**
 
-> "Economizei 2 horas por dia em tarefas repetitivas!" - Técnico de Suporte
+> "Economizei 2 horas por dia em tarefas repetitivas!" - João Paulo
 >
-> "Finalmente consigo acessar configurações sem depender de suporte!" - Usuário Final
+> "Finalmente consigo acessar configurações sem depender de suporte!" - Vinicius Lourençon
 >
-> "Treinar novos técnicos ficou 10x mais fácil." - Supervisor de TI
+> "Treinar novos técnicos ficou 10x mais fácil." - Junior "shampoo" Hermogenes
 
 ---
 
